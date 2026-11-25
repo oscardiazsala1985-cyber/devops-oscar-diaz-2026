@@ -7,4 +7,4 @@ env:
   # El shell reenvía /mf1/* a este Service interno (nombre = release de mf1)
   MF1_URL: http://bbog-frontend-portal-mf1
 route:
-  enabled: true # solo tiene efecto en OpenShift
+  enabled: false
