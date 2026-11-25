@@ -1,0 +1,12 @@
+server {
+  listen 8080;
+  root /usr/share/nginx/html;
+
+  location /health { return 200 'ok'; add_header Content-Type text/plain; }
+
+  location / {
+    add_header Access-Control-Allow-Origin "*";
+    add_header Cache-Control "no-cache";   # remoteEntry.js no debe quedar cacheado
+    try_files $uri $uri/ /index.html;
+  }
+}

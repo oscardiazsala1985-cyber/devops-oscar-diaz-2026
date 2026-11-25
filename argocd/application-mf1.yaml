@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bbog-frontend-portal-mf1
+  namespace: argocd              # en OpenShift GitOps: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/oscardiazsala1985-cyber/devops-oscar-diaz-2026.git
+    targetRevision: main
+    path: helm/portal-mf          # chart
+    helm:
+      releaseName: bbog-frontend-portal-mf1
+      valueFiles:
+        - values.yaml
+        - ../../gitops/mf1/values.yaml   # <- aquí vive la imagen/tag (lo cambia el pipeline)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: portal
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

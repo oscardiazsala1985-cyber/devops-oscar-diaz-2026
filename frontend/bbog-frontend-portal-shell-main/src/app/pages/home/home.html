@@ -1,0 +1,23 @@
+<section class="home">
+  <h2>Bienvenido</h2>
+  <p>
+    Este es el shell del portal. Los micro frontends federados se cargan
+    dinámicamente dentro de esta interfaz mediante Module Federation.
+  </p>
+
+  <div class="home__cards">
+    <a class="home__card" routerLink="/mf1">
+      <h3>mf1</h3>
+      <p>Micro frontend de base cargado vía Module Federation.</p>
+    </a>
+  </div>
+
+  <div class="home__event-bus">
+    <h3>Event Bus (Shell ↔ mf1)</h3>
+    <button type="button" (click)="publishToMf1()">Enviar mensaje a mf1</button>
+    <p>
+      Último mensaje recibido de mf1:
+      <strong>{{ lastMessageFromMf1() ?? '— sin mensajes aún —' }}</strong>
+    </p>
+  </div>
+</section>

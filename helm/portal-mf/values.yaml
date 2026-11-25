@@ -1,0 +1,23 @@
+# Valores POR DEFECTO del chart. Cada app los sobrescribe en gitops/<app>/values.yaml
+image:
+  repository: docker.io/oscardiazsala/bbog-frontend-portal-shell-main
+  tag: "latest"            # el pipeline lo reemplaza por el commit SHA
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  port: 80
+  targetPort: 8080         # nginx-unprivileged escucha en 8080
+
+# Variables de entorno del contenedor (ej. MF1_URL en el shell)
+env: {}
+
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits:   { cpu: 200m, memory: 128Mi }
+
+# Solo OpenShift: crea una Route para exponer la app (en K8s usar Ingress)
+route:
+  enabled: false
+  host: ""

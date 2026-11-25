@@ -1,0 +1,15 @@
+<div class="mf1-root">
+  <h2>{{ title() }}</h2>
+  <p>Micro frontend cargado vía Module Federation.</p>
+
+  <div class="mf1-event-bus">
+    <h3>Event Bus (mf1 ↔ Shell)</h3>
+    <button type="button" (click)="publishToShell()">Enviar mensaje al Shell</button>
+    <p>
+      Último mensaje recibido del Shell:
+      <strong>{{ lastMessageFromShell() ?? '— sin mensajes aún —' }}</strong>
+    </p>
+  </div>
+</div>
+
+<router-outlet />

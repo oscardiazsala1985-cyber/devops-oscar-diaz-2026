@@ -1,0 +1,76 @@
+name: CI-CD GitOps - Portal BBOG
+
+# 1. Solo con push a main.
+#    paths-ignore: el pipeline commitea gitops/**; sin esto se dispararía en bucle.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "gitops/**"
+      - "**.md"
+
+permissions:
+  contents: write        # necesario para commitear el nuevo tag
+
+env:
+  REGISTRY: docker.io
+  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  # 2 y 3. Compilar, construir y publicar una imagen por cada app (shell y mf1) en paralelo
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [bbog-frontend-portal-shell-main, bbog-frontend-portal-mf1]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      # El Dockerfile compila las libs, hace "ng build" y empaqueta en nginx.
+      - name: Build y push (tag = commit SHA)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          build-args: APP=${{ matrix.app }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_USER }}/${{ matrix.app }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+
+  # 4 y 5. GitOps: el pipeline solo escribe en Git. ArgoCD despliega.
+  update-gitops:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Actualizar image.repository e image.tag en gitops/*/values.yaml
+        run: |
+          yq -i '.image.repository = "docker.io/${{ env.DOCKER_USER }}/bbog-frontend-portal-shell-main"' gitops/shell/values.yaml
+          yq -i '.image.tag = "${{ github.sha }}"' gitops/shell/values.yaml
+          yq -i '.image.repository = "docker.io/${{ env.DOCKER_USER }}/bbog-frontend-portal-mf1"' gitops/mf1/values.yaml
+          yq -i '.image.tag = "${{ github.sha }}"' gitops/mf1/values.yaml
+          git diff
+
+      - name: Commit y push a Git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gitops
+          git diff --cached --quiet && echo "Sin cambios" && exit 0
+          git commit -m "chore(deploy): imagen ${{ github.sha }} [skip ci]"
+          git pull --rebase origin main
+          git push
+
+      # ArgoCD (auto-sync) detecta el commit y despliega con Helm.
+      # Opcional, para forzar sync:
+      # - run: argocd app sync bbog-frontend-portal-shell-main bbog-frontend-portal-mf1 --auth-token ${{ secrets.ARGOCD_TOKEN }} --server ${{ secrets.ARGOCD_SERVER }} --grpc-web

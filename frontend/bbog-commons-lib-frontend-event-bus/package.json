@@ -1,0 +1,45 @@
+{
+  "name": "bbog-commons-lib-frontend-event-bus",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Librería BBOG para transmisión asíncrona de mensajes mediante un bus de eventos Pub/Sub, para comunicación entre Shell y Microfrontends. Basada en @avaldigitallabs/adl-commons-lib-frontend-event-bus.",
+  "files": [
+    "build"
+  ],
+  "main": "./build/bbog-commons-lib-frontend-event-bus.cjs",
+  "module": "./build/bbog-commons-lib-frontend-event-bus.js",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "import": "./build/bbog-commons-lib-frontend-event-bus.js",
+      "require": "./build/bbog-commons-lib-frontend-event-bus.cjs"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.17.19",
+    "@types/uuid": "^10.0.0",
+    "jest": "^30.0.2",
+    "jest-canvas-mock": "^2.5.2",
+    "ts-jest": "^29.4.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "dependencies": {
+    "bbog-commons-lib-secure-web-storage": "file:../bbog-commons-lib-secure-web-storage",
+    "@types/node-forge": "^1.3.14",
+    "jest-environment-jsdom": "^30.0.2",
+    "node-forge": "^1.3.3",
+    "uuid": "^14.0.0"
+  }
+}

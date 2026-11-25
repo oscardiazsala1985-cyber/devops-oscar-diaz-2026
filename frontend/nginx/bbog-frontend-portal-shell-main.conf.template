@@ -1,0 +1,18 @@
+server {
+  listen 8080;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # El shell pide /mf1/remoteEntry.js; nginx lo reenvía al Service de mf1.
+  # MF1_URL viene de values.yaml (env) -> distinto por ambiente sin recompilar.
+  location /mf1/ {
+    proxy_pass ${MF1_URL}/;
+  }
+
+  location /health { return 200 'ok'; add_header Content-Type text/plain; }
+
+  # SPA: cualquier ruta cae en index.html (Angular router)
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
