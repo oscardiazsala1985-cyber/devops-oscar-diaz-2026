@@ -1,5 +1,5 @@
 # Este archivo lo MODIFICA el pipeline (image.tag = commit SHA). ArgoCD lo lee.
 image:
   repository: docker.io/oscardiazsala/bbog-frontend-portal-mf1
-  tag: "latest"
+  tag: "5396833d82ee832229ac000c037a67ca58e8e461"
 replicaCount: 2
